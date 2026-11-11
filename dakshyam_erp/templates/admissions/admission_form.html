@@ -1,12 +1,12 @@
 {% extends "base.html" %}
-{% block title %}New Admission | Dakshyam Innovations{% endblock %}
+{% block title %}{% if editing %}Edit {{ student.full_name }}{% else %}New Admission{% endif %} | {{ CENTER_NAME }}{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto">
   <div class="mb-6">
     <a href="{% url 'dashboard' %}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">← Back to Dashboard</a>
-    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">Student Admission Form</h1>
-    <p class="text-sm text-slate-500 mt-1">An official Enrollment ID (<code class="text-indigo-600 font-semibold">DI-YYYY-XXXX</code>) will be generated automatically.</p>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 mt-2">{% if editing %}Edit Student Record{% else %}Student Admission Form{% endif %}</h1>
+    <p class="text-sm text-slate-500 mt-1">{% if editing %}Enrollment ID <code class="text-indigo-600 font-semibold">{{ student.enrollment_no }}</code> cannot be changed.{% else %}An official Enrollment ID (<code class="text-indigo-600 font-semibold">DI-YYYY-XXXX</code>) will be generated automatically.{% endif %}</p>
   </div>
 
   <form method="post" enctype="multipart/form-data" class="space-y-6">
@@ -114,11 +114,11 @@
 
     <!-- Submit Bar -->
     <div class="flex items-center justify-end gap-3 pt-2">
-      <a href="{% url 'dashboard' %}" class="px-5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">
+      <a href="{% if editing %}{% url 'student_detail' student.id %}{% else %}{% url 'dashboard' %}{% endif %}" class="px-5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">
         Cancel
       </a>
       <button type="submit" class="px-6 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition">
-        Confirm Admission & Collect Fee →
+        {% if editing %}Save Changes{% else %}Confirm Admission &amp; Collect Fee →{% endif %}
       </button>
     </div>
   </form>

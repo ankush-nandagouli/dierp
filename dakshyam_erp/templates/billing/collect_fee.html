@@ -29,31 +29,37 @@
   <!-- Payment Form -->
   <form method="post" class="bg-white rounded-2xl border border-slate-200/80 p-6 shadow-sm space-y-5">
     {% csrf_token %}
+    {% for e in form.non_field_errors %}<p class="text-sm text-rose-600">{{ e }}</p>{% endfor %}
     <div class="grid grid-cols-1 sm:grid-cols-2 gap-5">
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Amount Paying Now (₹) *</label>
         {{ form.amount_paid }}
+        {% for e in form.amount_paid.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
       </div>
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Payment Mode *</label>
         {{ form.payment_mode }}
+        {% for e in form.payment_mode.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
       </div>
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">UPI Ref / Transaction ID</label>
         {{ form.transaction_ref }}
+        {% for e in form.transaction_ref.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
       </div>
       <div>
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Next Installment Due Date</label>
         {{ form.next_due_date }}
+        {% for e in form.next_due_date.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
       </div>
       <div class="sm:col-span-2">
         <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Remarks</label>
         {{ form.remarks }}
+        {% for e in form.remarks.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
       </div>
     </div>
 
     <div class="pt-4 border-t border-slate-100 flex justify-end gap-3">
-      <a href="{% url 'dashboard' %}" class="px-5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700">Skip for Now</a>
+      <a href="{% url 'student_detail' student.id %}" class="px-5 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700">Skip for Now</a>
       <button type="submit" class="px-6 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition">
         Generate Official Receipt
       </button>
