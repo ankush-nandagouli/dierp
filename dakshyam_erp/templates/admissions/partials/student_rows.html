@@ -1,0 +1,48 @@
+{% for s in students %}
+<tr class="hover:bg-slate-50/80 transition">
+  <td class="px-5 py-4 font-mono text-xs font-bold text-indigo-600 whitespace-nowrap">
+    {{ s.enrollment_no }}
+    <span class="block text-[11px] font-sans font-normal text-slate-400">{{ s.admission_date|date:"d M Y" }}</span>
+  </td>
+  <td class="px-5 py-4">
+    <p class="font-bold text-slate-900">{{ s.full_name }}</p>
+    <p class="text-xs text-slate-500">{{ s.school_or_college }} ({{ s.grade_or_year }})</p>
+    <p class="text-xs text-slate-400 mt-0.5">+91 {{ s.phone }}</p>
+  </td>
+  <td class="px-5 py-4">
+    <p class="font-semibold text-slate-800">{{ s.course.title }}</p>
+    <p class="text-xs text-slate-500">{{ s.batch_timing }}</p>
+  </td>
+  <td class="px-5 py-4 whitespace-nowrap">
+    {% if s.balance_due == 0 %}
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+        Paid in Full
+      </span>
+    {% else %}
+      <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-amber-50 text-amber-700 border border-amber-200">
+        Due: ₹{{ s.balance_due|floatformat:0 }}
+      </span>
+    {% endif %}
+  </td>
+  <td class="px-5 py-4 text-right whitespace-nowrap space-x-2">
+    <a href="{% url 'collect_fee' s.id %}"
+       class="inline-flex items-center px-3 py-1.5 rounded-lg bg-indigo-50 hover:bg-indigo-100 text-indigo-700 text-xs font-semibold transition">
+      Collect Fee
+    </a>
+    {% with latest=s.receipts.last %}
+      {% if latest %}
+        <a href="{% url 'view_receipt' latest.id %}"
+           class="inline-flex items-center px-3 py-1.5 rounded-lg border border-slate-200 hover:bg-slate-100 text-slate-700 text-xs font-semibold transition">
+          Receipt
+        </a>
+      {% endif %}
+    {% endwith %}
+  </td>
+</tr>
+{% empty %}
+<tr>
+  <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">
+    No matching student records found.
+  </td>
+</tr>
+{% endfor %}

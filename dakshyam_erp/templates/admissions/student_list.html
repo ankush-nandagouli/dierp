@@ -1,0 +1,77 @@
+{% extends "base.html" %}
+{% block title %}Student Directory | Dakshyam Innovations{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">Student Directory</h1>
+    <p class="text-sm text-slate-500 mt-1">Instant search by name, Enrollment ID, phone, or school/college.</p>
+  </div>
+  <a href="{% url 'create_admission' %}"
+     class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition">
+    <i data-lucide="user-plus" class="w-4 h-4"></i> New Admission
+  </a>
+</div>
+
+<!-- Live Filter Bar -->
+<div class="bg-white rounded-2xl border border-slate-200/80 p-4 mb-6 shadow-sm grid grid-cols-1 sm:grid-cols-4 gap-3">
+  <div class="sm:col-span-2 relative">
+    <input type="text"
+           name="q"
+           placeholder="Search name, DI-2026-..., phone, or school..."
+           hx-get="{% url 'student_directory' %}"
+           hx-trigger="keyup changed delay:250ms, search"
+           hx-target="#student-table-body"
+           hx-include="[name='track'], [name='fee']"
+           class="w-full rounded-xl border border-slate-300 pl-10 pr-4 py-2.5 text-sm focus:border-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-500/20" />
+    <i data-lucide="search" class="w-4 h-4 text-slate-400 absolute left-3.5 top-3"></i>
+  </div>
+
+  <div>
+    <select name="track"
+            hx-get="{% url 'student_directory' %}"
+            hx-trigger="change"
+            hx-target="#student-table-body"
+            hx-include="[name='q'], [name='fee']"
+            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:border-indigo-500 focus:outline-none">
+      <option value="">All Program Tracks</option>
+      {% for c in courses %}
+        <option value="{{ c.code }}">{{ c.title }}</option>
+      {% endfor %}
+    </select>
+  </div>
+
+  <div>
+    <select name="fee"
+            hx-get="{% url 'student_directory' %}"
+            hx-trigger="change"
+            hx-target="#student-table-body"
+            hx-include="[name='q'], [name='track']"
+            class="w-full rounded-xl border border-slate-300 px-3.5 py-2.5 text-sm bg-white focus:border-indigo-500 focus:outline-none">
+      <option value="">All Fee Statuses</option>
+      <option value="due">Balance Due</option>
+      <option value="paid">Fully Paid</option>
+    </select>
+  </div>
+</div>
+
+<!-- Responsive Directory Table -->
+<div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase text-slate-400 border-b border-slate-100">
+        <tr>
+          <th class="px-5 py-3.5">Enrollment ID</th>
+          <th class="px-5 py-3.5">Student & Institution</th>
+          <th class="px-5 py-3.5">Program & Batch</th>
+          <th class="px-5 py-3.5">Fee Status</th>
+          <th class="px-5 py-3.5 text-right">Actions</th>
+        </tr>
+      </thead>
+      <tbody id="student-table-body" class="divide-y divide-slate-100">
+        {% include "admissions/partials/student_rows.html" %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}

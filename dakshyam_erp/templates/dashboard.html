@@ -1,0 +1,143 @@
+{% extends "base.html" %}
+{% block title %}Dashboard | Dakshyam Innovations{% endblock %}
+
+{% block content %}
+<!-- Top Header -->
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">Center Overview</h1>
+    <p class="text-sm text-slate-500 mt-1">Admissions, fee collections, and active tracks at Waraseoni Center.</p>
+  </div>
+  <div class="flex items-center gap-3">
+    <a href="{% url 'create_admission' %}"
+       class="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm shadow-indigo-600/20 transition">
+      <i data-lucide="user-plus" class="w-4 h-4"></i> New Admission
+    </a>
+  </div>
+</div>
+
+<!-- KPI Cards Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5 mb-8">
+  <!-- Active Students -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Active Students</span>
+      <div class="w-9 h-9 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center">
+        <i data-lucide="users" class="w-4 h-4"></i>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-900 mt-3">{{ total_students }}</p>
+    <p class="text-xs text-emerald-600 font-medium mt-1.5 flex items-center gap-1">
+      <i data-lucide="trending-up" class="w-3.5 h-3.5"></i> Currently enrolled
+    </p>
+  </div>
+
+  <!-- Total Revenue Collected -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Fees Collected</span>
+      <div class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center">
+        <i data-lucide="indian-rupee" class="w-4 h-4"></i>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-900 mt-3">₹{{ total_collected|floatformat:0 }}</p>
+    <p class="text-xs text-slate-500 mt-1.5">Verified digital & cash receipts</p>
+  </div>
+
+  <!-- Pending Dues -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 p-5 shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold uppercase tracking-wider text-slate-400">Pending Dues</span>
+      <div class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center">
+        <i data-lucide="clock" class="w-4 h-4"></i>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold text-slate-900 mt-3">₹{{ total_pending|floatformat:0 }}</p>
+    <p class="text-xs text-amber-600 font-medium mt-1.5">Installment balances due</p>
+  </div>
+
+  <!-- Active Tracks -->
+  <div class="bg-gradient-to-br from-slate-900 to-indigo-950 rounded-2xl p-5 text-white shadow-sm">
+    <div class="flex items-center justify-between">
+      <span class="text-xs font-bold uppercase tracking-wider text-cyan-300">Program Tracks</span>
+      <div class="w-9 h-9 rounded-xl bg-white/10 text-cyan-300 flex items-center justify-center">
+        <i data-lucide="cpu" class="w-4 h-4"></i>
+      </div>
+    </div>
+    <p class="text-3xl font-extrabold mt-3">{{ courses.count }}</p>
+    <p class="text-xs text-slate-300 mt-1.5">Coding, Web, Flutter & IoT</p>
+  </div>
+</div>
+
+<!-- Two-Column Section: Recent Fee Receipts & Course Fee Structure -->
+<div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+  <!-- Recent Fee Receipts (2 cols) -->
+  <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+    <div class="px-6 py-4 border-b border-slate-100 flex items-center justify-between">
+      <h2 class="font-bold text-slate-900">Recent Fee Receipts</h2>
+      <span class="text-xs font-semibold text-indigo-600">Latest 6 transactions</span>
+    </div>
+
+    <div class="overflow-x-auto">
+      <table class="w-full text-left text-sm">
+        <thead class="bg-slate-50 text-xs uppercase text-slate-400 border-b border-slate-100">
+          <tr>
+            <th class="px-6 py-3">Receipt</th>
+            <th class="px-6 py-3">Student</th>
+            <th class="px-6 py-3">Mode</th>
+            <th class="px-6 py-3 text-right">Amount</th>
+            <th class="px-6 py-3 text-right">Action</th>
+          </tr>
+        </thead>
+        <tbody class="divide-y divide-slate-100">
+          {% for receipt in recent_receipts %}
+          <tr class="hover:bg-slate-50/80 transition">
+            <td class="px-6 py-3.5 font-mono text-xs font-bold text-indigo-600">{{ receipt.receipt_no }}</td>
+            <td class="px-6 py-3.5">
+              <p class="font-semibold text-slate-900">{{ receipt.student.full_name }}</p>
+              <p class="text-xs text-slate-500">{{ receipt.student.course.title }}</p>
+            </td>
+            <td class="px-6 py-3.5">
+              <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-slate-100 text-slate-700">
+                {{ receipt.get_payment_mode_display }}
+              </span>
+            </td>
+            <td class="px-6 py-3.5 text-right font-bold text-emerald-600">₹{{ receipt.amount_paid }}</td>
+            <td class="px-6 py-3.5 text-right">
+              <a href="{% url 'view_receipt' receipt.id %}"
+                 class="inline-flex items-center gap-1 text-xs font-semibold text-indigo-600 hover:text-indigo-800">
+                View <i data-lucide="arrow-up-right" class="w-3.5 h-3.5"></i>
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5" class="px-6 py-10 text-center text-slate-400 text-sm">
+              No fee receipts generated yet. Create a new admission to log the first payment.
+            </td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Active Courses Card (1 col) -->
+  <div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
+    <h2 class="font-bold text-slate-900 mb-4">Active Tracks & Fees</h2>
+    <div class="space-y-3">
+      {% for course in courses %}
+      <div class="p-3.5 rounded-xl border border-slate-100 bg-slate-50/70 flex items-center justify-between gap-3">
+        <div>
+          <p class="text-sm font-bold text-slate-900">{{ course.title }}</p>
+          <p class="text-xs text-slate-500 mt-0.5">{{ course.get_duration_display }}</p>
+        </div>
+        <span class="text-sm font-extrabold text-indigo-600 whitespace-nowrap">₹{{ course.total_fee|floatformat:0 }}</span>
+      </div>
+      {% empty %}
+      <p class="text-xs text-slate-400">Add course tracks in Django Admin to display fee slabs here.</p>
+      {% endfor %}
+    </div>
+  </div>
+</div>
+{% endblock %}

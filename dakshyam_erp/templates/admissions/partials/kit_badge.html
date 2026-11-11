@@ -1,0 +1,11 @@
+<button hx-post="{% url 'toggle_kit_status' student.id %}"
+        hx-headers='{"X-CSRFToken": "{{ csrf_token }}"}'
+        hx-swap="outerHTML"
+        class="inline-flex items-center gap-1.5 px-3.5 py-1.5 rounded-full text-xs font-bold transition cursor-pointer
+               {% if student.kit_issued %}bg-emerald-100 text-emerald-800 hover:bg-emerald-200{% else %}bg-amber-100 text-amber-800 hover:bg-amber-200{% endif %}">
+  {% if student.kit_issued %}
+    ✓ Kit Issued
+  {% else %}
+    ⏳ Pending Handover
+  {% endif %}
+</button>

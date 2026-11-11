@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>{% block title %}Dakshyam Innovations | ERP Portal{% endblock %}</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+    body { font-family: 'Plus Jakarta Sans', sans-serif; }
+    @media print { .no-print { display: none !important; } }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-900 antialiased" x-data="{ sidebarOpen: false }">
+
+  <div class="min-h-screen flex flex-col lg:flex-row">
+    <!-- Mobile Header -->
+    <header class="no-print lg:hidden flex items-center justify-between bg-slate-900 text-white px-4 py-3 sticky top-0 z-40">
+      <div class="flex items-center gap-2.5">
+        <div class="w-8 h-8 rounded-lg bg-indigo-500 flex items-center justify-center font-extrabold">D</div>
+        <span class="font-bold tracking-tight">Dakshyam Innovations</span>
+      </div>
+      <button @click="sidebarOpen = !sidebarOpen" class="p-2 rounded-lg hover:bg-slate-800">
+        <i data-lucide="menu" class="w-6 h-6"></i>
+      </button>
+    </header>
+
+    <!-- Sidebar -->
+    <aside :class="sidebarOpen ? 'translate-x-0' : '-translate-x-full'"
+           class="no-print fixed lg:static inset-y-0 left-0 z-50 w-68 bg-slate-950 text-slate-300 transition-transform duration-200 lg:translate-x-0 flex flex-col justify-between p-5">
+      <div>
+        <div class="hidden lg:flex items-center gap-3 pb-6 border-b border-slate-800">
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-cyan-400 flex items-center justify-center text-white font-extrabold text-lg shadow-lg">DI</div>
+          <div>
+            <h1 class="text-white font-bold leading-tight">Dakshyam</h1>
+            <p class="text-xs text-cyan-400 font-medium">Learn • Build • Innovate</p>
+          </div>
+        </div>
+
+        <nav class="mt-6 space-y-1.5 text-sm font-medium">
+          <a href="{% url 'dashboard' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl bg-indigo-600/20 text-indigo-300 border border-indigo-500/30">
+            <i data-lucide="layout-dashboard" class="w-4 h-4"></i> Dashboard
+          </a>
+          <a href="{% url 'create_admission' %}" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition">
+            <i data-lucide="user-plus" class="w-4 h-4"></i> New Admission
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition">
+            <i data-lucide="users" class="w-4 h-4"></i> Students & Batches
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition">
+            <i data-lucide="receipt" class="w-4 h-4"></i> Fee Receipts
+          </a>
+          <a href="#" class="flex items-center gap-3 px-3.5 py-2.5 rounded-xl hover:bg-slate-900 hover:text-white transition">
+            <i data-lucide="cpu" class="w-4 h-4"></i> IoT & Robotics Kits
+          </a>
+        </nav>
+      </div>
+
+      <div class="p-3.5 rounded-xl bg-slate-900/90 border border-slate-800 text-xs text-slate-400">
+        <p class="text-slate-200 font-semibold">Waraseoni Center</p>
+        <p class="mt-0.5">Siddhivinayak Complex, Balaghat Rd</p>
+      </div>
+    </aside>
+
+    <!-- Main Workspace -->
+    <main class="flex-1 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
+      {% if messages %}
+        <div class="no-print mb-5 space-y-2">
+          {% for message in messages %}
+            <div class="p-4 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-800 text-sm font-medium flex items-center justify-between">
+              <span>{{ message }}</span>
+            </div>
+          {% endfor %}
+        </div>
+      {% endif %}
+      {% block content %}{% endblock %}
+    </main>
+  </div>
+  <script>lucide.createIcons();</script>
+</body>
+</html>

@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}IoT & Robotics Kits | Dakshyam Innovations{% endblock %}
+
+{% block content %}
+<div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+  <div>
+    <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900">IoT & Robotics Starter Kits</h1>
+    <p class="text-sm text-slate-500 mt-1">Track ESP32, Arduino, and sensor kit allocation for enrolled students.</p>
+  </div>
+  <div class="flex gap-3 text-xs font-bold">
+    <span class="px-3.5 py-2 rounded-xl bg-emerald-50 text-emerald-700 border border-emerald-200">Issued: {{ issued_count }}</span>
+    <span class="px-3.5 py-2 rounded-xl bg-amber-50 text-amber-700 border border-amber-200">Pending: {{ pending_count }}</span>
+  </div>
+</div>
+
+<div class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden">
+  <div class="overflow-x-auto">
+    <table class="w-full text-left text-sm">
+      <thead class="bg-slate-50 text-xs uppercase text-slate-400 border-b border-slate-100">
+        <tr>
+          <th class="px-6 py-3.5">Enrollment ID</th>
+          <th class="px-6 py-3.5">Student</th>
+          <th class="px-6 py-3.5">Track</th>
+          <th class="px-6 py-3.5">Fee Paid</th>
+          <th class="px-6 py-3.5 text-right">Kit Status (Click to Toggle)</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-slate-100">
+        {% for student in students %}
+        <tr class="hover:bg-slate-50/70">
+          <td class="px-6 py-4 font-mono text-xs font-bold text-indigo-600">{{ student.enrollment_no }}</td>
+          <td class="px-6 py-4 font-bold text-slate-900">{{ student.full_name }}</td>
+          <td class="px-6 py-4 text-slate-600">{{ student.course.title }}</td>
+          <td class="px-6 py-4 font-semibold text-slate-800">₹{{ student.total_paid }} / ₹{{ student.net_payable_fee }}</td>
+          <td class="px-6 py-4 text-right">
+            {% include "academics/partials/kit_badge.html" %}
+          </td>
+        </tr>
+        {% empty %}
+        <tr>
+          <td colspan="5" class="px-6 py-10 text-center text-slate-400">No students enrolled in kit-inclusive tracks yet.</td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock %}
