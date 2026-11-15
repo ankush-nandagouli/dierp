@@ -7,7 +7,7 @@ locally (DEBUG) and in production without edits. See ``.env.example``.
 
 import os
 from pathlib import Path
-
+import dj_database_url
 BASE_DIR = Path(__file__).resolve().parent.parent
 
 
@@ -81,12 +81,30 @@ TEMPLATES = [
 WSGI_APPLICATION = "dakshyam_erp.wsgi.application"
 
 
-DATABASES = {
-    "default": {
-        "ENGINE": "django.db.backends.sqlite3",
-        "NAME": os.environ.get("DJANGO_DB_PATH") or BASE_DIR / "db.sqlite3",
+
+# Database configuration
+# PostgreSQL is selected automatically when DATABASE_URL exists.
+# Otherwise, the application uses SQLite.
+
+DATABASE_URL = os.environ.get("DATABASE_URL")
+
+if DATABASE_URL:
+    DATABASES = {
+        "default": dj_database_url.config(
+            default=DATABASE_URL,
+            conn_max_age=600,
+            conn_health_checks=True,
+            ssl_require=not DEBUG,
+        )
     }
-}
+else:
+    DATABASES = {
+        "default": {
+            "ENGINE": "django.db.backends.sqlite3",
+            "NAME": os.environ.get("DJANGO_DB_PATH") or BASE_DIR / "db.sqlite3",
+        }
+    }
+
 
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
