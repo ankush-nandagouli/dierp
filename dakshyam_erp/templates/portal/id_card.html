@@ -1,0 +1,57 @@
+{% load static %}<!DOCTYPE html>
+<html lang="en-IN"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex, nofollow">
+<title>ID card - {{ student.full_name }} | {{ SITE.name }}</title>
+<link rel="stylesheet" href="{% static 'portal/css/site.css' %}">
+<style>
+ body{background:#e2e8f0;padding:1.5rem}
+ .sheet{display:flex;gap:1.5rem;flex-wrap:wrap;justify-content:center;margin-top:1rem}
+ .idc{width:85.6mm;height:54mm;background:#fff;border-radius:3.5mm;overflow:hidden;position:relative;box-shadow:0 2px 10px rgba(15,23,42,.25);font-size:8.5pt;color:#0f172a;break-inside:avoid;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+ .idc .top{background:linear-gradient(135deg,#0f172a,#4338ca);color:#fff;height:13mm;display:flex;align-items:center;gap:2.5mm;padding:0 4mm}
+ .idc .top img{height:9mm;width:auto;background:#fff;border-radius:1.5mm;padding:.5mm}
+ .idc .top b{font-size:10pt;line-height:1.1}.idc .top small{display:block;font-size:6.5pt;opacity:.8}
+ .idc .body{display:flex;gap:3.5mm;padding:3mm 4mm}
+ .idc .photo{width:21mm;height:26mm;border-radius:2mm;object-fit:cover;background:#eef2ff;border:.3mm solid #cbd5e1;display:grid;place-items:center;font-size:20pt;font-weight:800;color:#4f46e5;flex:none}
+ .idc .name{font-size:11pt;font-weight:800;line-height:1.15;margin-bottom:1mm}
+ .idc .row{margin:.4mm 0;line-height:1.25}.idc .row span{color:#64748b;font-size:6.5pt;text-transform:uppercase;letter-spacing:.04em;display:block}
+ .idc .foot{position:absolute;bottom:0;left:0;right:0;background:#f1f5f9;padding:1.2mm 4mm;font-size:6.5pt;display:flex;justify-content:space-between}
+ .back .inner{padding:4mm;display:flex;gap:4mm;align-items:center;height:41mm}.back .qr{width:24mm;height:24mm;flex:none}
+ .back p{margin:0 0 1.5mm;line-height:1.3;font-size:7pt}.sign{margin-top:4mm;border-top:.3mm solid #64748b;font-size:6pt;color:#64748b;width:32mm;padding-top:.5mm}
+ @page{size:A4;margin:12mm}
+ @media print{body{background:#fff;padding:0}.idc{box-shadow:none;border:.2mm solid #94a3b8}.sheet{justify-content:flex-start}}
+</style></head>
+<body>
+<div class="no-print container" style="max-width:720px">
+  <p><button class="btn" onclick="window.print()">Print / save as PDF</button>
+  {% if request.user.is_staff %}<a class="btn ghost" href="{% url 'student_detail' student.pk %}">Back</a>{% else %}<a class="btn ghost" href="{% url 'portal:student_dashboard' %}">Back</a>{% endif %}</p>
+  <p class="small muted">Tip: in the print dialog choose "Save as PDF", set margins to Default and enable "Background graphics".</p>
+</div>
+<div class="sheet">
+  <section class="idc" aria-label="ID card front">
+    <div class="top">{% if SITE.logo %}<img src="{{ SITE.logo.url }}" alt="">{% endif %}<div><b>{{ SITE.name }}</b><small>STUDENT IDENTITY CARD</small></div></div>
+    <div class="body">
+      {% if student.photo %}<img class="photo" src="{{ student.photo.url }}" alt="Photo of {{ student.full_name }}">{% else %}<div class="photo" aria-hidden="true">{{ student.full_name|slice:":1" }}</div>{% endif %}
+      <div>
+        <div class="name">{{ student.full_name }}</div>
+        <div class="row"><span>Enrollment no.</span><b>{{ student.enrollment_no }}</b></div>
+        <div class="row"><span>Course</span>{{ student.course.title }}</div>
+        <div class="row"><span>Batch</span>{% if student.batch %}{{ student.batch.name }} &middot; {{ student.batch.timing }}{% else %}{{ student.batch_timing }}{% endif %}</div>
+      </div>
+    </div>
+    <div class="foot"><span>Admitted: {{ student.admission_date|date:"d M Y" }}</span><span>Valid till: <b>{{ student.valid_till|date:"d M Y" }}</b></span></div>
+  </section>
+  <section class="idc back" aria-label="ID card back">
+    <div class="top"><div><b>{{ SITE.name }}</b><small>{{ SITE.tagline }}</small></div></div>
+    <div class="inner">
+      <img class="qr" src="{{ qr }}" alt="QR code to verify this ID card">
+      <div>
+        <p><b>Scan to verify</b> this card is genuine and currently valid.</p>
+        <p>{{ SITE.address }}{% if SITE.phone %}<br>Ph: +91 {{ SITE.phone }}{% endif %}</p>
+        <p>This card is the property of {{ SITE.name }}. If found, please return it to the address above.</p>
+        <div class="sign">Authorised signatory</div>
+      </div>
+    </div>
+  </section>
+</div>
+</body></html>

@@ -2,27 +2,29 @@ import csv
 from decimal import Decimal
 
 from django.contrib import messages
-from django.contrib.auth.decorators import login_required
+from django.contrib.auth import get_user_model
 from django.core.paginator import Paginator
 from django.db.models import Q, Sum
 from django.http import HttpResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.utils import timezone
+from django.utils.crypto import get_random_string
 from django.views.decorators.http import require_POST
 
-from .forms import AdmissionForm, FeeReceiptForm
-from .models import CourseTrack, FeeReceipt, StudentAdmission
+from .decorators import staff_required, superuser_required
+from .forms import AdmissionForm, BrandingForm, FeeReceiptForm
+from .models import CourseTrack, FeeReceipt, SiteSettings, StudentAdmission
 from .utils import generate_receipt_qr
 
 
 # ---------------------------------------------------------------- dashboard
-@login_required
+@staff_required
 def dashboard(request):
     today = timezone.localdate()
     receipts = FeeReceipt.objects.all()
     # One query for students + one for their receipts, no per-row queries.
     open_students = (
-        StudentAdmission.objects.exclude(status="DROPPED")
+        StudentAdmission.objects.exclude(status__in=["DROPPED", "PENDING"])
         .select_related("course")
         .prefetch_related("receipts")
     )
@@ -35,12 +37,14 @@ def dashboard(request):
         "total_pending": sum((s.balance_due for s in open_students), Decimal("0")),
         "recent_receipts": receipts.select_related("student", "student__course")[:6],
         "courses": CourseTrack.objects.all(),
+        "pending_applications": StudentAdmission.objects.filter(status="PENDING").select_related("course")[:6],
+        "pending_count": StudentAdmission.objects.filter(status="PENDING").count(),
     }
     return render(request, "dashboard.html", context)
 
 
 # --------------------------------------------------------------- admissions
-@login_required
+@staff_required
 def create_admission(request):
     form = AdmissionForm(request.POST or None, request.FILES or None)
     if request.method == "POST" and form.is_valid():
@@ -50,7 +54,7 @@ def create_admission(request):
     return render(request, "admissions/admission_form.html", {"form": form, "editing": False})
 
 
-@login_required
+@staff_required
 def edit_admission(request, student_id):
     student = get_object_or_404(StudentAdmission, id=student_id)
     form = AdmissionForm(request.POST or None, request.FILES or None, instance=student)
@@ -63,7 +67,7 @@ def edit_admission(request, student_id):
     )
 
 
-@login_required
+@staff_required
 def student_detail(request, student_id):
     student = get_object_or_404(
         StudentAdmission.objects.select_related("course").prefetch_related("receipts"), id=student_id
@@ -95,7 +99,7 @@ def _filtered_students(request):
     return student_list, track_filter, fee_filter
 
 
-@login_required
+@staff_required
 def student_directory(request):
     student_list, track_filter, fee_filter = _filtered_students(request)
     context = {
@@ -115,7 +119,7 @@ def _csv_safe(value):
     return "'" + text if text[:1] in ("=", "+", "-", "@") else text
 
 
-@login_required
+@staff_required
 def export_students_csv(request):
     student_list, _, _ = _filtered_students(request)
     response = HttpResponse(content_type="text/csv")
@@ -137,7 +141,7 @@ def export_students_csv(request):
 
 
 # --------------------------------------------------------------------- kits
-@login_required
+@staff_required
 def kit_tracker(request):
     students = StudentAdmission.objects.select_related("course").prefetch_related("receipts").filter(
         Q(course__includes_robotics_kit=True) | Q(kit_issued=True)
@@ -150,7 +154,7 @@ def kit_tracker(request):
     })
 
 
-@login_required
+@staff_required
 @require_POST
 def toggle_kit_status(request, student_id):
     student = get_object_or_404(StudentAdmission, id=student_id)
@@ -160,7 +164,7 @@ def toggle_kit_status(request, student_id):
 
 
 # ------------------------------------------------------------------ billing
-@login_required
+@staff_required
 def collect_fee(request, student_id):
     student = get_object_or_404(StudentAdmission.objects.select_related("course"), id=student_id)
     if student.balance_due == 0:
@@ -180,7 +184,7 @@ def collect_fee(request, student_id):
     return render(request, "billing/collect_fee.html", {"student": student, "form": form})
 
 
-@login_required
+@staff_required
 def receipt_list(request):
     query = request.GET.get("q", "").strip()
     receipts = FeeReceipt.objects.select_related("student", "student__course")
@@ -196,7 +200,7 @@ def receipt_list(request):
     return render(request, "billing/receipt_list.html", {"page": page, "query": query, "total": total})
 
 
-@login_required
+@staff_required
 def view_receipt(request, receipt_id):
     receipt = get_object_or_404(
         FeeReceipt.objects.select_related("student", "student__course"), id=receipt_id
@@ -223,3 +227,72 @@ def handler404(request, exception=None):
 
 def handler500(request):
     return render(request, "500.html", status=500)
+
+
+def handler403(request, exception=None):
+    return render(request, "403.html", status=403)
+
+
+# ------------------------------------------------ online applications & portal access
+@staff_required
+@require_POST
+def approve_admission(request, student_id):
+    from portal import emails
+
+    student = get_object_or_404(StudentAdmission.objects.select_related("course", "user"), pk=student_id)
+    if student.status != "PENDING":
+        messages.info(request, f"{student.full_name} is already {student.get_status_display().lower()}.")
+    else:
+        student.status = "ACTIVE"
+        student.save(update_fields=["status"])
+        if student.user and student.email_verified:
+            emails.send_admission_confirmed_email(request, student, SiteSettings.load())
+        messages.success(request, f"Admission approved for {student.full_name}. Next: assign a batch and collect the fee.")
+    return redirect("student_detail", student_id=student.id)
+
+
+@staff_required
+@require_POST
+def invite_student(request, student_id):
+    """Create a portal login for an already-admitted student and email a set-password link."""
+    from portal import emails
+
+    User = get_user_model()
+    student = get_object_or_404(StudentAdmission, pk=student_id)
+    email = (student.email or "").strip().lower()
+    if student.user_id:
+        messages.info(request, "This student already has a portal login.")
+    elif not email:
+        messages.error(request, "Add the student's email address first (Edit), then send the invite.")
+    elif User.objects.filter(Q(username__iexact=email) | Q(email__iexact=email)).exists():
+        messages.error(request, "Another account already uses this email address.")
+    else:
+        user = User.objects.create_user(
+            username=email, email=email, password=get_random_string(40),
+            first_name=student.full_name.split(" ")[0][:150], last_name=" ".join(student.full_name.split(" ")[1:])[:150],
+        )
+        student.user = user
+        student.email_verified = True  # the emailed link below proves ownership of the address
+        student.save(update_fields=["user", "email_verified"])
+        sent = emails.send_set_password_email(request, user)
+        messages.success(request, f"Portal login created. A set-password link was {'emailed to ' + email if sent else 'NOT sent (email problem) - use Forgot password on the login page'}.")
+    return redirect("student_detail", student_id=student.id)
+
+
+@staff_required
+def staff_id_card(request, student_id):
+    from portal.idcard import id_card_context
+
+    student = get_object_or_404(StudentAdmission.objects.select_related("course", "batch"), pk=student_id)
+    return render(request, "portal/id_card.html", id_card_context(request, student))
+
+
+@superuser_required
+def branding_settings(request):
+    site = SiteSettings.load()
+    form = BrandingForm(request.POST or None, request.FILES or None, instance=site)
+    if request.method == "POST" and form.is_valid():
+        form.save()
+        messages.success(request, "Branding and website settings saved.")
+        return redirect("branding_settings")
+    return render(request, "settings/branding.html", {"form": form, "site": site})

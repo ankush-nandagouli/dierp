@@ -1,10 +1,17 @@
-from django.conf import settings
+from django.db import DatabaseError
+
+from .models import SiteSettings
 
 
 def center(request):
-    """Expose branding values to every template."""
+    """Expose branding (editable by the admin) to every template."""
+    try:
+        site = SiteSettings.load()
+    except DatabaseError:  # e.g. before the first migrate
+        site = SiteSettings()
     return {
-        "CENTER_NAME": settings.CENTER_NAME,
-        "CENTER_LOCATION": settings.CENTER_LOCATION,
-        "CENTER_ADDRESS": settings.CENTER_ADDRESS,
+        "SITE": site,
+        "CENTER_NAME": site.name,
+        "CENTER_LOCATION": site.location_line,
+        "CENTER_ADDRESS": site.address,
     }

@@ -1,0 +1,14 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Resend confirmation email | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow">
+  <h1>Resend confirmation email</h1>
+  {% if done %}
+    <div class="alert success">If that address belongs to an unconfirmed account, a new link is on its way. Please check your inbox and spam folder.</div>
+  {% endif %}
+  <form method="post" class="form-card">{% csrf_token %}
+    {% include "portal/_field.html" with field=form.email %}
+    <button class="btn" type="submit">Send link</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,58 @@
+{% extends "portal/app_base.html" %}
+{% block title %}My dashboard | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/student/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section">
+  <div style="display:flex;gap:1rem;align-items:center;margin-bottom:1.5rem">
+    {% if student.photo %}<img class="avatar" src="{{ student.photo.url }}" alt="Your photo">{% else %}<div class="avatar" aria-hidden="true">{{ student.full_name|slice:":1" }}</div>{% endif %}
+    <div><h1 style="margin:0;font-size:1.6rem">Welcome, {{ student.full_name }}</h1>
+      <span class="muted small">{{ student.enrollment_no }}</span>
+      {% if student.status == 'PENDING' %}<span class="badge warn">Awaiting approval</span>{% elif student.status == 'ACTIVE' %}<span class="badge ok">Active</span>{% else %}<span class="badge gray">{{ student.get_status_display }}</span>{% endif %}</div>
+  </div>
+
+  {% if student.status == 'PENDING' %}<div class="alert info">Your registration is received. The center will confirm your admission soon; you will get an email. Your ID card becomes available after approval.</div>{% endif %}
+
+  <div class="grid cols-2">
+    <section class="card" aria-labelledby="course-h">
+      <h2 id="course-h" style="font-size:1.15rem">My course</h2>
+      <dl class="kv" style="grid-template-columns:1fr 1fr">
+        <div><dt>Course</dt><dd>{{ student.course.title }}</dd></div>
+        <div><dt>Duration</dt><dd>{{ student.course.get_duration_display }}</dd></div>
+        <div><dt>Batch</dt><dd>{% if student.batch %}{{ student.batch.name }}{% else %}Not assigned yet{% endif %}</dd></div>
+        <div><dt>Timing</dt><dd>{% if student.batch %}{{ student.batch.timing }}{% else %}{{ student.batch_timing }}{% endif %}</dd></div>
+        <div><dt>Trainer</dt><dd>{% if student.batch.trainer %}{{ student.batch.trainer.full_name }}{% else %}-{% endif %}</dd></div>
+        <div><dt>Admitted on</dt><dd>{{ student.admission_date|date:"d M Y" }}</dd></div>
+      </dl>
+    </section>
+
+    <section class="card" aria-labelledby="fee-h">
+      <h2 id="fee-h" style="font-size:1.15rem">Fees</h2>
+      <dl class="kv" style="grid-template-columns:1fr 1fr 1fr">
+        <div><dt>Payable</dt><dd>&#8377;{{ student.net_payable_fee }}</dd></div>
+        <div><dt>Paid</dt><dd>&#8377;{{ student.total_paid }}</dd></div>
+        <div><dt>Balance</dt><dd>&#8377;{{ student.balance_due }}</dd></div>
+      </dl>
+      <p style="margin-top:1rem"><a href="{% url 'portal:student_receipts' %}">View receipts &rarr;</a></p>
+    </section>
+
+    <section class="card" aria-labelledby="att-h">
+      <h2 id="att-h" style="font-size:1.15rem">Attendance</h2>
+      {% if stats.total %}
+        <p class="stat">{{ stats.percent }}%</p>
+        <div class="bar" aria-hidden="true"><i style="width:{{ stats.percent }}%"></i></div>
+        <p class="small muted" style="margin-top:.5rem">{{ stats.present }} present &middot; {{ stats.late }} late &middot; {{ stats.absent }} absent ({{ stats.total }} classes)</p>
+      {% else %}<p class="muted">No attendance recorded yet.</p>{% endif %}
+    </section>
+
+    <section class="card" aria-labelledby="recent-h">
+      <h2 id="recent-h" style="font-size:1.15rem">Recent classes</h2>
+      {% for a in recent_attendance %}
+        <div style="display:flex;justify-content:space-between;border-top:1px solid var(--line);padding:.4rem 0">
+          <span>{{ a.date|date:"D, d M" }}</span>
+          <span class="badge {% if a.status == 'P' %}ok{% elif a.status == 'L' %}warn{% else %}bad{% endif %}">{{ a.get_status_display }}</span>
+        </div>
+      {% empty %}<p class="muted">Nothing yet.</p>{% endfor %}
+    </section>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,40 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Attendance {{ day|date:"d M Y" }} | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/trainer/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section">
+  <p><a href="{% url 'portal:trainer_dashboard' %}">&larr; My batches</a></p>
+  <h1 style="font-size:1.5rem">Attendance &middot; {{ batch.course.title }} &middot; {{ batch.name }}</h1>
+
+  <form method="get" class="card" style="display:flex;gap:.75rem;align-items:flex-end;flex-wrap:wrap;margin-bottom:1rem">
+    <div class="field" style="margin:0"><label for="date">Date</label>
+      <input class="input" type="date" id="date" name="date" value="{{ day|date:'Y-m-d' }}" min="{{ min_date|date:'Y-m-d' }}" max="{{ today|date:'Y-m-d' }}"></div>
+    <button class="btn ghost" type="submit">Load date</button>
+  </form>
+
+  {% for e in errors %}<div class="alert error" role="alert">{{ e }}</div>{% endfor %}
+
+  {% if not locked %}
+  <form method="post" class="card" novalidate>{% csrf_token %}
+    <input type="hidden" name="date" value="{{ day|date:'Y-m-d' }}">
+    <p><strong>{{ day|date:"l, d F Y" }}</strong>
+       <button type="button" class="btn small ghost" onclick="document.querySelectorAll('input[type=radio][value=P]').forEach(function(r){r.checked=true})">Mark all present</button></p>
+    <div class="table-wrap" style="border:0"><table>
+      <thead><tr><th>Student</th><th>Status</th><th>Remarks</th></tr></thead>
+      <tbody>
+      {% for r in rows %}
+        <tr>
+          <td><strong>{{ r.student.full_name }}</strong><div class="small muted">{{ r.student.enrollment_no }}</div></td>
+          <td><div class="seg" role="radiogroup" aria-label="Status for {{ r.student.full_name }}">
+            {% for code, label in choices %}
+              <label class="{{ code|lower }}"><input type="radio" class="check" style="display:none" name="status_{{ r.student.pk }}" value="{{ code }}" {% if r.status == code %}checked{% endif %}><span>{{ label }}</span></label>
+            {% endfor %}</div></td>
+          <td><input class="input" type="text" maxlength="120" name="remarks_{{ r.student.pk }}" value="{{ r.remarks }}" placeholder="Optional"></td>
+        </tr>
+      {% empty %}<tr><td colspan="3" class="center muted" style="padding:2rem">No active students in this batch.</td></tr>{% endfor %}
+      </tbody></table></div>
+    {% if rows %}<button class="btn" type="submit">Save attendance</button>{% endif %}
+  </form>
+  {% endif %}
+</div>
+{% endblock %}

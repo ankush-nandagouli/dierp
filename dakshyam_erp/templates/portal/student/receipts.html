@@ -1,0 +1,20 @@
+{% extends "portal/app_base.html" %}
+{% block title %}My fee receipts | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/student/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section">
+  <h1 style="font-size:1.6rem">Fee receipts</h1>
+  <div class="table-wrap">
+    <table>
+      <thead><tr><th>Receipt</th><th>Date</th><th>Mode</th><th>Amount</th><th></th></tr></thead>
+      <tbody>
+      {% for r in receipts %}
+        <tr><td><strong>{{ r.receipt_no }}</strong></td><td>{{ r.payment_date|date:"d M Y" }}</td><td>{{ r.get_payment_mode_display }}</td><td>&#8377;{{ r.amount_paid }}</td>
+            <td class="right"><a href="{% url 'portal:student_receipt' r.pk %}">View / print</a></td></tr>
+      {% empty %}<tr><td colspan="5" class="center muted" style="padding:2rem">No payments recorded yet.</td></tr>{% endfor %}
+      </tbody>
+    </table>
+  </div>
+  <p class="muted" style="margin-top:1rem">Total paid: <strong>&#8377;{{ student.total_paid }}</strong> &middot; Balance due: <strong>&#8377;{{ student.balance_due }}</strong></p>
+</div>
+{% endblock %}

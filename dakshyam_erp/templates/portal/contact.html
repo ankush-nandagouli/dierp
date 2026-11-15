@@ -1,0 +1,17 @@
+{% extends "portal/base_public.html" %}
+{% block title %}Contact {{ SITE.name }} | {{ SITE.city }}, Balaghat{% endblock %}
+{% block meta_description %}Visit or contact {{ SITE.name }} in {{ SITE.city }}, Balaghat. Address, phone and email.{% endblock %}
+{% block og_title %}Contact {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow">
+  <h1>Contact us</h1>
+  <div class="card">
+    <dl class="kv" style="grid-template-columns:1fr">
+      <div><dt>Address</dt><dd>{{ SITE.address }}</dd></div>
+      {% if SITE.phone %}<div><dt>Phone / WhatsApp</dt><dd><a href="tel:+91{{ SITE.phone }}">+91 {{ SITE.phone }}</a></dd></div>{% endif %}
+      {% if SITE.email %}<div><dt>Email</dt><dd><a href="mailto:{{ SITE.email }}">{{ SITE.email }}</a></dd></div>{% endif %}
+    </dl>
+  </div>
+  <p style="margin-top:1.5rem"><a class="btn" href="{% url 'portal:register' %}">Register online</a></p>
+</div>
+{% endblock %}

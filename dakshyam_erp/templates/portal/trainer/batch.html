@@ -1,0 +1,20 @@
+{% extends "portal/app_base.html" %}
+{% block title %}{{ batch.name }} students | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/trainer/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section">
+  <p><a href="{% url 'portal:trainer_dashboard' %}">&larr; My batches</a></p>
+  <h1 style="font-size:1.5rem">{{ batch.course.title }} &middot; {{ batch.name }}</h1>
+  <p class="muted">{{ batch.timing }}</p>
+  <p><a class="btn small" href="{% url 'portal:trainer_attendance' batch.pk %}">Mark attendance</a> <a class="btn small ghost" href="{% url 'portal:trainer_report' batch.pk %}">Attendance report</a></p>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Student</th><th>Enrollment</th><th>Class / year</th><th>Contact</th><th>Attendance</th></tr></thead>
+    <tbody>
+    {% for s in students %}{% with st=s.attendance_stats %}
+      <tr><td><strong>{{ s.full_name }}</strong></td><td>{{ s.enrollment_no }}</td><td>{{ s.grade_or_year }}</td>
+          <td>{{ s.guardian_name }}<br><a href="tel:+91{{ s.phone }}" class="small">+91 {{ s.phone }}</a></td>
+          <td>{% if st.total %}{{ st.percent }}% <span class="small muted">({{ st.total }})</span>{% else %}-{% endif %}</td></tr>
+    {% endwith %}{% empty %}<tr><td colspan="5" class="center muted" style="padding:2rem">No students in this batch yet.</td></tr>{% endfor %}
+    </tbody></table></div>
+</div>
+{% endblock %}

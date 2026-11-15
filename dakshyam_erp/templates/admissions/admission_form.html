@@ -50,6 +50,11 @@
           {{ form.email }}
         </div>
         <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Date of Birth</label>
+          {{ form.date_of_birth }}
+          {% for e in form.date_of_birth.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Student Photo (Optional)</label>
           {{ form.photo }}
         </div>
@@ -94,6 +99,15 @@
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Batch Timing *</label>
           {{ form.batch_timing }}
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Assigned Batch (trainer class)</label>
+          {{ form.batch }}
+          {% for e in form.batch.errors %}<p class="text-xs text-rose-600 mt-1">{{ e }}</p>{% endfor %}
+        </div>
+        <div>
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Status</label>
+          {{ form.status }}
         </div>
         <div>
           <label class="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1.5">Admission Date *</label>

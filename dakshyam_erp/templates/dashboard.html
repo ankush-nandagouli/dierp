@@ -1,7 +1,20 @@
 {% extends "base.html" %}
-{% block title %}Dashboard | Dakshyam Innovations{% endblock %}
+{% block title %}Dashboard | {{ CENTER_NAME }}{% endblock %}
 
 {% block content %}
+{% if pending_count %}
+<div class="mb-6 rounded-2xl border border-amber-200 bg-amber-50 p-5">
+  <p class="font-bold text-amber-900">{{ pending_count }} online application{{ pending_count|pluralize }} awaiting approval</p>
+  <ul class="mt-2 divide-y divide-amber-100 text-sm">
+    {% for s in pending_applications %}
+    <li class="py-2 flex items-center justify-between gap-3">
+      <span><a class="font-semibold text-slate-900 hover:underline" href="{% url 'student_detail' s.id %}">{{ s.full_name }}</a> <span class="text-slate-500">&middot; {{ s.course.title }} &middot; {{ s.admission_date|date:"d M" }}</span>{% if not s.email_verified %} <span class="text-xs text-rose-600 font-semibold">email not verified</span>{% endif %}</span>
+      <a class="text-indigo-600 font-semibold text-xs" href="{% url 'student_detail' s.id %}">Review &rarr;</a>
+    </li>
+    {% endfor %}
+  </ul>
+</div>
+{% endif %}
 <!-- Top Header -->
 <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
   <div>

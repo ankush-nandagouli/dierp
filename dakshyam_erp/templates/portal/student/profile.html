@@ -1,0 +1,17 @@
+{% extends "portal/app_base.html" %}
+{% block title %}My profile | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/student/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section narrow" style="max-width:720px">
+  <h1 style="font-size:1.6rem">My profile</h1>
+  <div class="card" style="margin-bottom:1rem">
+    <dl class="kv"><div><dt>Name</dt><dd>{{ student.full_name }}</dd></div><div><dt>Enrollment no.</dt><dd>{{ student.enrollment_no }}</dd></div><div><dt>Email</dt><dd>{{ student.email }}</dd></div><div><dt>Course</dt><dd>{{ student.course.title }}</dd></div></dl>
+    <p class="small muted" style="margin:.8rem 0 0">Name, email and course can only be changed by the center. Contact the office if something is wrong.</p>
+  </div>
+  <form method="post" enctype="multipart/form-data" class="form-card" novalidate>{% csrf_token %}
+    {% for e in form.non_field_errors %}<div class="alert error">{{ e }}</div>{% endfor %}
+    {% for field in form %}{% include "portal/_field.html" with field=field %}{% endfor %}
+    <button class="btn" type="submit">Save changes</button>
+  </form>
+</div>
+{% endblock %}

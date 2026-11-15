@@ -1,19 +1,21 @@
 from django.conf import settings
-from django.conf.urls.static import static
 from django.contrib import admin
-from django.contrib.auth import views as auth_views
-from django.urls import include, path
+from django.urls import include, path, re_path
+from django.views.static import serve
 
 urlpatterns = [
     path("admin/", admin.site.urls),
-    # Explicit auth routes only: the password-reset views have no templates here.
-    path("accounts/login/", auth_views.LoginView.as_view(), name="login"),
-    path("accounts/logout/", auth_views.LogoutView.as_view(), name="logout"),
-    path("", include("institute.urls")),
+    path("", include("portal.account_urls")),
+    path("", include("portal.urls")),  # public website, accounts, student & trainer portals
+    path("", include("institute.urls")),  # staff ERP
 ]
 
 handler404 = "institute.views.handler404"
 handler500 = "institute.views.handler500"
 
-if settings.DEBUG:
-    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
+handler403 = "institute.views.handler403"
+
+if settings.SERVE_MEDIA:
+    urlpatterns += [
+        re_path(r"^%s(?P<path>.*)$" % settings.MEDIA_URL.lstrip("/"), serve, {"document_root": settings.MEDIA_ROOT}),
+    ]

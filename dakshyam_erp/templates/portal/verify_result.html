@@ -1,0 +1,15 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Email confirmation | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow center">
+  {% if ok %}
+    <h1>Email confirmed</h1>
+    <p>Thank you! Your account is active. You can now sign in to your student portal. The center will review and approve your admission.</p>
+    <p><a class="btn" href="{% url 'login' %}">Sign in</a></p>
+  {% else %}
+    <h1>Link not valid</h1>
+    <p class="muted">This confirmation link is invalid or has expired.</p>
+    <p><a class="btn" href="{% url 'portal:resend_verification' %}">Send me a new link</a></p>
+  {% endif %}
+</div>
+{% endblock %}

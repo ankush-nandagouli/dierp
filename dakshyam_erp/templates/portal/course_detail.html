@@ -1,0 +1,28 @@
+{% extends "portal/base_public.html" %}
+{% block title %}{{ course.title }} Course in {{ SITE.city }} | {{ SITE.name }}{% endblock %}
+{% block meta_description %}{{ course.summary|default:SITE.meta_description }}{% endblock %}
+{% block og_title %}{{ course.title }} | {{ SITE.name }}{% endblock %}
+{% block og_description %}{{ course.summary|default:SITE.meta_description }}{% endblock %}
+{% block content %}
+<div class="container section narrow" style="max-width:820px">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'portal:home' %}">Home</a> &rsaquo; <a href="{% url 'portal:course_list' %}">Courses</a> &rsaquo; {{ course.title }}</nav>
+  <article>
+    <h1>{{ course.title }}</h1>
+    <p><span class="badge">{{ course.get_duration_display }}</span>
+       {% if course.includes_robotics_kit %}<span class="badge ok">Robotics starter kit</span>{% endif %}
+       {% if SITE.show_fees and course.total_fee > 0 %}<span class="badge gray">&#8377;{{ course.total_fee|floatformat:0 }}</span>{% endif %}</p>
+    {% if course.summary %}<p style="font-size:1.1rem">{{ course.summary }}</p>{% endif %}
+    {% for p in paragraphs %}<p>{{ p|linebreaksbr }}</p>{% endfor %}
+
+    <h2 style="margin-top:2rem">Batches</h2>
+    {% for b in batches %}
+      <div class="card" style="margin-bottom:.75rem">
+        <strong>{{ b.name }}</strong> &middot; {{ b.timing }}
+        {% if b.trainer %}<div class="muted small">Trainer: {{ b.trainer.full_name }}</div>{% endif %}
+      </div>
+    {% empty %}<p class="muted">New batches are announced regularly. Register and we will place you in the next one.</p>{% endfor %}
+
+    <p style="margin-top:1.5rem"><a class="btn" href="{% url 'portal:register' %}?course={{ course.slug }}">Register for this course</a></p>
+  </article>
+</div>
+{% endblock %}

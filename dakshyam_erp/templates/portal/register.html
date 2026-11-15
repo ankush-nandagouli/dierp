@@ -1,0 +1,52 @@
+{% extends "portal/base_public.html" %}
+{% block title %}Register for a Course Online | {{ SITE.name }}{% endblock %}
+{% block meta_description %}Register online for computer, web development, IoT and robotics courses at {{ SITE.name }}, {{ SITE.city }}.{% endblock %}
+{% block og_title %}Register for a course | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow" style="max-width:760px">
+  <h1>Register for a course</h1>
+  <p class="muted">Fill in the details below. We email a link to confirm your address, and the center approves your admission afterwards.</p>
+  <form method="post" enctype="multipart/form-data" class="form-card" novalidate>
+    {% csrf_token %}
+    {% if form.non_field_errors %}<div class="alert error">{{ form.non_field_errors }}</div>{% endif %}
+    {% if form.errors and not form.non_field_errors %}<div class="alert error" role="alert">Please correct the highlighted fields.</div>{% endif %}
+    <div class="hp-field" aria-hidden="true">{% include "portal/_field.html" with field=form.website %}</div>
+
+    <fieldset><legend>Student details</legend>
+      {% include "portal/_field.html" with field=form.full_name %}
+      <div class="row2">
+        {% include "portal/_field.html" with field=form.date_of_birth %}
+        {% include "portal/_field.html" with field=form.grade_or_year %}
+      </div>
+      {% include "portal/_field.html" with field=form.school_or_college %}
+      {% include "portal/_field.html" with field=form.address %}
+      {% include "portal/_field.html" with field=form.photo %}
+    </fieldset>
+
+    <fieldset><legend>Parent / guardian &amp; contact</legend>
+      {% include "portal/_field.html" with field=form.guardian_name %}
+      <div class="row2">
+        {% include "portal/_field.html" with field=form.phone %}
+        {% include "portal/_field.html" with field=form.whatsapp_no %}
+      </div>
+    </fieldset>
+
+    <fieldset><legend>Course</legend>
+      {% include "portal/_field.html" with field=form.course %}
+      {% include "portal/_field.html" with field=form.batch %}
+    </fieldset>
+
+    <fieldset><legend>Create your account</legend>
+      {% include "portal/_field.html" with field=form.email %}
+      <div class="row2">
+        {% include "portal/_field.html" with field=form.password1 %}
+        {% include "portal/_field.html" with field=form.password2 %}
+      </div>
+      {% include "portal/_field.html" with field=form.accept_terms %}
+    </fieldset>
+
+    <button class="btn" type="submit">Submit registration</button>
+    <p class="small muted" style="margin-top:1rem">Already registered? <a href="{% url 'login' %}">Sign in</a></p>
+  </form>
+</div>
+{% endblock %}

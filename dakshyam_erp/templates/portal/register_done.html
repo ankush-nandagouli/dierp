@@ -1,0 +1,14 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Check your email | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow center">
+  <h1>Almost done!</h1>
+  {% if sent %}
+    <p>We sent a confirmation link to <strong>{{ email|default:"your email address" }}</strong>. Open it to activate your account, then sign in.</p>
+  {% else %}
+    <div class="alert warning">Your registration was saved, but we could not send the email right now. Use the button below to request a new link.</div>
+  {% endif %}
+  <p class="muted">The link works for 48 hours. Check your spam folder if you do not see it.</p>
+  <p><a class="btn ghost" href="{% url 'portal:resend_verification' %}">Resend confirmation email</a></p>
+</div>
+{% endblock %}

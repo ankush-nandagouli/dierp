@@ -39,11 +39,14 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+    "django.contrib.sitemaps",
     "institute",
+    "portal",
 ]
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
+    "portal.middleware.MigrationCheckMiddleware",  # friendly page if `migrate` has not been run
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
@@ -114,16 +117,36 @@ MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
+# Email. Defaults to printing emails in the console (development). For real verification
+# emails set DJANGO_EMAIL_BACKEND=django.core.mail.backends.smtp.EmailBackend plus the vars below.
 EMAIL_BACKEND = os.environ.get("DJANGO_EMAIL_BACKEND", "django.core.mail.backends.console.EmailBackend")
+EMAIL_HOST = os.environ.get("EMAIL_HOST", "localhost")
+EMAIL_PORT = int(os.environ.get("EMAIL_PORT", "587"))
+EMAIL_HOST_USER = os.environ.get("EMAIL_HOST_USER", "")
+EMAIL_HOST_PASSWORD = os.environ.get("EMAIL_HOST_PASSWORD", "")
+EMAIL_USE_TLS = env_bool("EMAIL_USE_TLS", True)
+DEFAULT_FROM_EMAIL = os.environ.get("DEFAULT_FROM_EMAIL", "Dakshyam Innovations <no-reply@localhost>")
+
+# Sign-in by username OR email address.
+AUTHENTICATION_BACKENDS = [
+    "portal.backends.EmailOrUsernameBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
 
 LOGIN_URL = "login"
-LOGIN_REDIRECT_URL = "dashboard"
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "portal:after_login"
+LOGOUT_REDIRECT_URL = "portal:home"
 
-# Branding shown in the UI / receipts (see institute/context_processors.py)
-CENTER_NAME = os.environ.get("CENTER_NAME", "Dakshyam Innovations")
-CENTER_LOCATION = os.environ.get("CENTER_LOCATION", "Waraseoni, Balaghat, M.P.")
-CENTER_ADDRESS = os.environ.get("CENTER_ADDRESS", "Siddhivinayak Complex, Balaghat Rd")
+EMAIL_VERIFICATION_MAX_AGE = 60 * 60 * 48  # verification links expire after 48 hours
+PASSWORD_RESET_TIMEOUT = 60 * 60 * 3
+# Set True only behind a proxy you control that overwrites X-Forwarded-For.
+TRUST_X_FORWARDED_FOR = env_bool("DJANGO_TRUST_X_FORWARDED_FOR", False)
+# Serve uploaded files (logo, photos) from Django. Convenient for small single-server setups;
+# prefer nginx/Caddy for /media/ when you can.
+SERVE_MEDIA = env_bool("DJANGO_SERVE_MEDIA", DEBUG)
+
+SESSION_COOKIE_AGE = 60 * 60 * 24 * 14
+SECURE_REFERRER_POLICY = "strict-origin-when-cross-origin"
 
 # Production hardening
 if not DEBUG:

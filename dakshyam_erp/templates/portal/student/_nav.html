@@ -1,0 +1,9 @@
+{% with n=request.resolver_match.url_name %}
+<div class="subnav no-print"><div class="container" role="navigation" aria-label="Student">
+  <a href="{% url 'portal:student_dashboard' %}" {% if n == 'student_dashboard' %}aria-current="page"{% endif %}>Overview</a>
+  <a href="{% url 'portal:student_receipts' %}" {% if n == 'student_receipts' or n == 'student_receipt' %}aria-current="page"{% endif %}>Fee receipts</a>
+  <a href="{% url 'portal:student_id_card' %}" {% if n == 'student_id_card' %}aria-current="page"{% endif %}>ID card</a>
+  <a href="{% url 'portal:student_profile' %}" {% if n == 'student_profile' %}aria-current="page"{% endif %}>My profile</a>
+  <a href="{% url 'password_change' %}">Change password</a>
+</div></div>
+{% endwith %}

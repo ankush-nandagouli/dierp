@@ -1,0 +1,7 @@
+{% with n=request.resolver_match.url_name %}
+<div class="subnav no-print"><div class="container" role="navigation" aria-label="Trainer">
+  <a href="{% url 'portal:trainer_dashboard' %}" {% if n == 'trainer_dashboard' or n == 'trainer_batch' or n == 'trainer_attendance' or n == 'trainer_report' %}aria-current="page"{% endif %}>My batches</a>
+  <a href="{% url 'portal:trainer_profile' %}" {% if n == 'trainer_profile' %}aria-current="page"{% endif %}>My profile</a>
+  <a href="{% url 'password_change' %}">Change password</a>
+</div></div>
+{% endwith %}

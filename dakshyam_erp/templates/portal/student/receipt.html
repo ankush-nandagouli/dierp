@@ -1,0 +1,30 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Receipt {{ receipt.receipt_no }} | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/student/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section narrow" style="max-width:720px">
+  <p class="no-print"><a href="{% url 'portal:student_receipts' %}">&larr; All receipts</a> &nbsp; <button class="btn small" onclick="window.print()">Print / save as PDF</button></p>
+  <article class="card" style="padding:2rem">
+    <header style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;border-bottom:1px solid var(--line);padding-bottom:1rem;margin-bottom:1rem">
+      <div style="display:flex;gap:.8rem;align-items:center">
+        {% if SITE.logo %}<img src="{{ SITE.logo.url }}" alt="" style="height:48px">{% endif %}
+        <div><strong style="font-size:1.2rem">{{ SITE.name|upper }}</strong><div class="small muted">{{ SITE.address }}</div></div>
+      </div>
+      <div class="right"><div class="small muted">OFFICIAL FEE RECEIPT</div><strong>{{ receipt.receipt_no }}</strong><div class="small">{{ receipt.payment_date|date:"d M Y, h:i A" }}</div></div>
+    </header>
+    <dl class="kv">
+      <div><dt>Student</dt><dd>{{ student.full_name }}</dd></div>
+      <div><dt>Enrollment no.</dt><dd>{{ student.enrollment_no }}</dd></div>
+      <div><dt>Course</dt><dd>{{ student.course.title }}</dd></div>
+      <div><dt>Payment mode</dt><dd>{{ receipt.get_payment_mode_display }}</dd></div>
+      {% if receipt.transaction_ref %}<div><dt>Reference</dt><dd>{{ receipt.transaction_ref }}</dd></div>{% endif %}
+      {% if receipt.next_due_date %}<div><dt>Next due date</dt><dd>{{ receipt.next_due_date|date:"d M Y" }}</dd></div>{% endif %}
+    </dl>
+    <div style="display:flex;justify-content:space-between;align-items:flex-end;margin-top:1.5rem;gap:1rem">
+      <div><div class="small muted">Amount received</div><div class="stat">&#8377;{{ receipt.amount_paid }}</div></div>
+      <div class="center"><img src="data:image/png;base64,{{ qr_base64 }}" alt="QR code to verify this receipt" width="96" height="96"><div class="small muted">Scan to verify</div></div>
+    </div>
+    {% if receipt.remarks %}<p class="small muted">Remarks: {{ receipt.remarks }}</p>{% endif %}
+  </article>
+</div>
+{% endblock %}

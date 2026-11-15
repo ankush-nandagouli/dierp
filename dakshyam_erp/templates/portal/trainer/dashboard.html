@@ -1,0 +1,22 @@
+{% extends "portal/app_base.html" %}
+{% block title %}Trainer dashboard | {{ SITE.name }}{% endblock %}
+{% block subnav %}{% include "portal/trainer/_nav.html" %}{% endblock %}
+{% block content %}
+<div class="container section">
+  <h1 style="font-size:1.6rem">Hello, {{ trainer.full_name }}</h1>
+  <p class="muted">Today is {{ today|date:"l, d F Y" }}.</p>
+  <div class="grid cols-2">
+    {% for b in batches %}
+    <section class="card">
+      <span class="badge">{{ b.course.code }}</span>
+      {% if b.marked_today %}<span class="badge ok">Today marked</span>{% else %}<span class="badge warn">Today pending</span>{% endif %}
+      <h2 style="font-size:1.2rem;margin-top:.5rem">{{ b.course.title }}</h2>
+      <p class="muted">{{ b.name }} &middot; {{ b.timing }} &middot; {{ b.active_count }} active student{{ b.active_count|pluralize }}</p>
+      <a class="btn small" href="{% url 'portal:trainer_attendance' b.pk %}">Mark attendance</a>
+      <a class="btn small ghost" href="{% url 'portal:trainer_report' b.pk %}">Report</a>
+      <a class="btn small ghost" href="{% url 'portal:trainer_batch' b.pk %}">Students</a>
+    </section>
+    {% empty %}<div class="card"><p class="muted" style="margin:0">No batches are assigned to you yet. Please contact the administrator.</p></div>{% endfor %}
+  </div>
+</div>
+{% endblock %}

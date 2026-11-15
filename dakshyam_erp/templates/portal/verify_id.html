@@ -1,0 +1,21 @@
+{% extends "portal/app_base.html" %}
+{% block title %}ID verification | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section narrow" style="max-width:480px">
+  {% if student %}
+    <div class="card center">
+      {% if valid %}<div class="badge ok" style="font-size:.9rem">&#10003; Valid student ID</div>{% else %}<div class="badge bad" style="font-size:.9rem">Not currently valid</div>{% endif %}
+      {% if student.photo %}<p style="margin-top:1rem"><img class="avatar" style="margin:auto" src="{{ student.photo.url }}" alt=""></p>{% endif %}
+      <h1 style="font-size:1.4rem;margin-top:1rem">{{ student.full_name }}</h1>
+      <dl class="kv" style="text-align:left;margin-top:1rem;grid-template-columns:1fr">
+        <div><dt>Enrollment no.</dt><dd>{{ student.enrollment_no }}</dd></div>
+        <div><dt>Course</dt><dd>{{ student.course.title }}</dd></div>
+        <div><dt>Valid till</dt><dd>{{ student.valid_till|date:"d M Y" }}</dd></div>
+      </dl>
+      <p class="small muted">Issued by {{ SITE.name }}.</p>
+    </div>
+  {% else %}
+    <div class="card center"><div class="badge bad">Invalid ID</div><p class="muted" style="margin-top:1rem">This QR code is not a genuine {{ SITE.name }} ID card.</p></div>
+  {% endif %}
+</div>
+{% endblock %}

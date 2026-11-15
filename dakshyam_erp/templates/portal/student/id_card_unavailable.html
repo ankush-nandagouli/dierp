@@ -1,0 +1,11 @@
+{% extends "portal/app_base.html" %} {% block title %}ID card | {{ SITE.name
+}}{% endblock %} {% block subnav %}{% include "portal/student/_nav.html" %}{%
+endblock %} {% block content %}
+<div class="container section narrow center">
+  <h1>ID card not available yet</h1>
+  <p class="muted">
+    Your ID card is issued once the center approves your admission. Current
+    status: <strong>{{ student.get_status_display }}</strong>.
+  </p>
+</div>
+{% endblock %}

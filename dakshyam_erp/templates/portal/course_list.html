@@ -1,0 +1,24 @@
+{% extends "portal/base_public.html" %}
+{% block title %}Courses | {{ SITE.name }}, {{ SITE.city }}{% endblock %}
+{% block meta_description %}Computer, programming, web development, mobile app, IoT and robotics courses at {{ SITE.name }}, {{ SITE.city }}, Balaghat. See durations and register online.{% endblock %}
+{% block og_title %}Courses | {{ SITE.name }}{% endblock %}
+{% block content %}
+<div class="container section">
+  <nav class="breadcrumb" aria-label="Breadcrumb"><a href="{% url 'portal:home' %}">Home</a> &rsaquo; Courses</nav>
+  <h1>Courses at {{ SITE.name }}</h1>
+  <p class="muted">Choose a track, check the details, and register online.</p>
+  <div class="grid cols-2">
+    {% for c in courses %}
+    <article class="card">
+      <span class="badge">{{ c.get_duration_display }}</span>
+      {% if c.includes_robotics_kit %}<span class="badge ok">Robotics kit included</span>{% endif %}
+      <h2 style="margin-top:.6rem;font-size:1.25rem"><a href="{{ c.get_absolute_url }}" style="text-decoration:none;color:inherit">{{ c.title }}</a></h2>
+      <p class="muted">{{ c.summary }}</p>
+      {% if SITE.show_fees and c.total_fee > 0 %}<p><strong>&#8377;{{ c.total_fee|floatformat:0 }}</strong></p>{% endif %}
+      <a class="btn small" href="{{ c.get_absolute_url }}">Details</a>
+      <a class="btn small ghost" href="{% url 'portal:register' %}?course={{ c.slug }}">Register</a>
+    </article>
+    {% empty %}<p>No courses are open right now.</p>{% endfor %}
+  </div>
+</div>
+{% endblock %}

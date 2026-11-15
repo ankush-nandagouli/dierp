@@ -3,12 +3,16 @@ from django.urls import path
 from . import views
 
 urlpatterns = [
-    path("", views.dashboard, name="dashboard"),
+    path("dashboard/", views.dashboard, name="dashboard"),
     path("admissions/new/", views.create_admission, name="create_admission"),
     path("students/", views.student_directory, name="student_directory"),
     path("students/export/", views.export_students_csv, name="export_students"),
     path("students/<int:student_id>/", views.student_detail, name="student_detail"),
     path("students/<int:student_id>/edit/", views.edit_admission, name="edit_admission"),
+    path("students/<int:student_id>/id-card/", views.staff_id_card, name="staff_id_card"),
+    path("students/<int:student_id>/approve/", views.approve_admission, name="approve_admission"),
+    path("students/<int:student_id>/invite/", views.invite_student, name="invite_student"),
+    path("settings/branding/", views.branding_settings, name="branding_settings"),
     path("kits/", views.kit_tracker, name="kit_tracker"),
     path("kits/toggle/<int:student_id>/", views.toggle_kit_status, name="toggle_kit_status"),
     path("fees/", views.receipt_list, name="receipt_list"),

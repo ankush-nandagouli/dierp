@@ -1,6 +1,6 @@
 from django import forms
 
-from .models import FeeReceipt, StudentAdmission
+from .models import Batch, FeeReceipt, SiteSettings, StudentAdmission
 
 MAX_PHOTO_BYTES = 2 * 1024 * 1024
 
@@ -36,11 +36,13 @@ class AdmissionForm(TailwindFormMixin, forms.ModelForm):
         fields = [
             "full_name", "guardian_name", "phone", "whatsapp_no", "email",
             "school_or_college", "grade_or_year", "address", "photo",
-            "course", "batch_timing", "discount_amount", "admission_date", "kit_issued",
+            "date_of_birth", "course", "batch", "status", "batch_timing", "discount_amount",
+            "admission_date", "kit_issued",
         ]
         widgets = {
             "address": forms.Textarea(attrs={"rows": 2, "placeholder": "Ward / Village, Waraseoni, Balaghat"}),
             "admission_date": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
+            "date_of_birth": forms.DateInput(attrs={"type": "date"}, format="%Y-%m-%d"),
             "full_name": forms.TextInput(attrs={"placeholder": "e.g., Aarav Sharma"}),
             "guardian_name": forms.TextInput(attrs={"placeholder": "Parent / Guardian Full Name"}),
             "phone": forms.TextInput(attrs={"placeholder": "10-digit mobile number", "inputmode": "numeric"}),
@@ -48,6 +50,16 @@ class AdmissionForm(TailwindFormMixin, forms.ModelForm):
             "school_or_college": forms.TextInput(attrs={"placeholder": "e.g., Sardar Patel University / Kendriya Vidyalaya"}),
             "grade_or_year": forms.TextInput(attrs={"placeholder": "e.g., Class 10 / B.Tech 2nd Year"}),
         }
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields["batch"].queryset = Batch.objects.filter(is_active=True).select_related("course")
+        self.fields["batch"].required = False
+        self.fields["status"].required = False
+
+    def clean_status(self):
+        # New admissions default to Active; edits keep the current status unless changed.
+        return self.cleaned_data.get("status") or (self.instance.status if self.instance.pk else "ACTIVE")
 
     def clean_photo(self):
         photo = self.cleaned_data.get("photo")
@@ -87,3 +99,14 @@ class FeeReceiptForm(TailwindFormMixin, forms.ModelForm):
         if cleaned.get("payment_mode") in {"UPI", "BANK", "CARD"} and not cleaned.get("transaction_ref"):
             self.add_error("transaction_ref", "A reference / UTR number is required for non-cash payments.")
         return cleaned
+
+
+class BrandingForm(TailwindFormMixin, forms.ModelForm):
+    class Meta:
+        model = SiteSettings
+        fields = [
+            "name", "tagline", "logo", "phone", "email", "address", "city", "meta_description",
+            "show_fees", "facebook_url", "instagram_url", "youtube_url", "google_site_verification",
+            "trainer_edit_window_days",
+        ]
+        widgets = {"address": forms.Textarea(attrs={"rows": 2})}

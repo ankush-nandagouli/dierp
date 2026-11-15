@@ -1,0 +1,55 @@
+{% extends "portal/base_public.html" %}
+{% block title %}{{ SITE.name }} | Computer, Web, IoT &amp; Robotics Training in {{ SITE.city }}, Balaghat{% endblock %}
+{% block og_title %}{{ SITE.name }} | Training in {{ SITE.city }}, Balaghat{% endblock %}
+{% block content %}
+<section class="hero">
+  <div class="container">
+    <h1>Learn computers, web, IoT &amp; robotics in {{ SITE.city }}</h1>
+    <p>{{ SITE.meta_description }}</p>
+    <div class="actions">
+      <a class="btn" href="{% url 'portal:register' %}">Register for a course</a>
+      <a class="btn ghost" href="{% url 'portal:course_list' %}">Browse courses</a>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container">
+    <h2>Our courses</h2>
+    <p class="muted">Practical, project-based tracks for school students and college learners.</p>
+    <div class="grid cols-3">
+      {% for c in courses %}
+      <article class="card">
+        <span class="badge">{{ c.get_duration_display }}</span>
+        {% if c.includes_robotics_kit %}<span class="badge ok">Robotics kit</span>{% endif %}
+        <h3 style="margin-top:.6rem"><a href="{{ c.get_absolute_url }}">{{ c.title }}</a></h3>
+        <p class="muted">{{ c.summary|default:"Hands-on training with a dedicated trainer." }}</p>
+        <a href="{{ c.get_absolute_url }}">View details &rarr;</a>
+      </article>
+      {% empty %}
+      <p class="muted">Courses will be announced soon. Please check back or <a href="{% url 'portal:contact' %}">contact us</a>.</p>
+      {% endfor %}
+    </div>
+    {% if courses %}<p style="margin-top:1.5rem"><a class="btn ghost" href="{% url 'portal:course_list' %}">See all courses</a></p>{% endif %}
+  </div>
+</section>
+
+<section class="section" style="background:#fff;border-top:1px solid var(--line);border-bottom:1px solid var(--line)">
+  <div class="container">
+    <h2>What you get</h2>
+    <div class="grid cols-3">
+      <div><h3>Trainer-led batches</h3><p class="muted">Every course runs in scheduled batches with a named trainer who tracks your attendance.</p></div>
+      <div><h3>Your own student portal</h3><p class="muted">Sign in to see your course and batch, attendance, fee receipts and download your ID card.</p></div>
+      <div><h3>Verifiable receipts &amp; ID</h3><p class="muted">Receipts and ID cards carry a QR code that anyone can scan to confirm they are genuine.</p></div>
+    </div>
+  </div>
+</section>
+
+<section class="section">
+  <div class="container center">
+    <h2>Ready to start?</h2>
+    <p class="muted">Create your account in two minutes. We will confirm your admission after you register.</p>
+    <a class="btn" href="{% url 'portal:register' %}">Register now</a>
+  </div>
+</section>
+{% endblock %}
