@@ -28,7 +28,7 @@ if not SECRET_KEY:
     else:
         raise RuntimeError("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is off.")
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else "")
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1" if DEBUG else "dakshyamerp.vercel.app")
 CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS")
 
 
@@ -86,23 +86,15 @@ WSGI_APPLICATION = "dakshyam_erp.wsgi.application"
 # PostgreSQL is selected automatically when DATABASE_URL exists.
 # Otherwise, the application uses SQLite.
 
-DATABASE_URL = os.environ.get("DATABASE_URL")
+DATABASE_URL = os.environ.get("DATABASE_URL", "postgres://avnadmin:AVNS_LYPwQ4edBnbkNlmFctu@dakshyam-erp-ankushnanda-a194.c.aivencloud.com:18962/defaultdb?sslmode=require")
 
-if DATABASE_URL:
-    DATABASES = {
+DATABASES = {
         "default": dj_database_url.config(
             default=DATABASE_URL,
             conn_max_age=600,
             conn_health_checks=True,
             ssl_require=not DEBUG,
         )
-    }
-else:
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": os.environ.get("DJANGO_DB_PATH") or BASE_DIR / "db.sqlite3",
-        }
     }
 
 
