@@ -28,8 +28,8 @@ if not SECRET_KEY:
     else:
         raise RuntimeError("DJANGO_SECRET_KEY must be set when DJANGO_DEBUG is off.")
 
-ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,dakshyamerp.vercel.app,https://dakshyamerp.vercel.app" if DEBUG else "dakshyamerp.vercel.app,https://dakshyamerp.vercel.app")
-CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "dakshyamerp.vercel.app,https://dakshyamerp.vercel.app")
+ALLOWED_HOSTS = env_list("DJANGO_ALLOWED_HOSTS", "localhost,127.0.0.1,dakshyamerp.vercel.app,https://dakshyamerp.vercel.app,erp.dakshyaminnovations.in,https://erp.dakshyaminnovations.in" if DEBUG else "dakshyamerp.vercel.app,https://dakshyamerp.vercel.app,erp.dakshyaminnovations.in,https://erp.dakshyaminnovations.in")
+CSRF_TRUSTED_ORIGINS = env_list("DJANGO_CSRF_TRUSTED_ORIGINS", "dakshyamerp.vercel.app,https://dakshyamerp.vercel.app,erp.dakshyaminnovations.in,https://erp.dakshyaminnovations.in")
 
 
 INSTALLED_APPS = [
