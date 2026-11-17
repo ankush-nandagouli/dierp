@@ -1,4 +1,5 @@
-{% extends "base.html" %} {% block title %}{{ student.full_name }} | {{CENTER_NAME }}{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}{{ student.full_name }} | {{CENTER_NAME }}{% endblock %} 
+{% block content %}
 <div class="max-w-5xl mx-auto">
   <a href="{% url 'student_directory' %}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">← Back to Directory</a>
 
