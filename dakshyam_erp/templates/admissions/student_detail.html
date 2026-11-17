@@ -100,8 +100,7 @@
         <div>
           <dt class="text-xs uppercase text-slate-400 font-semibold">Batch</dt>
           <dd class="font-medium">
-            {% if student.batch %}{{ student.batch }}{% else %}Not assigned{%
-            endif %}
+            {% if student.batch %}{{ student.batch }}{% else %}Not assigned{% endif %}
           </dd>
         </div>
         <div>
@@ -110,7 +109,8 @@
           </dt>
           <dd class="font-medium">
             {% if student.user_id %}Yes{% if not student.email_verified %}
-            (email not verified){% endif %}{% else %}No{% endif %}{% if student.registered_online %} &middot; registered online{% endif %}
+            (email not verified){% endif %}{% else %}No{% endif %}
+            {% if student.registered_online %} &middot; registered online{% endif %}
           </dd>
         </div>
         <div>
