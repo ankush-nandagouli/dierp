@@ -1,26 +1,13 @@
-{% extends "base.html" %} {% block title %}{{ student.full_name }} | {{
-CENTER_NAME }}{% endblock %} {% block content %}
+{% extends "base.html" %} {% block title %}{{ student.full_name }} | {{CENTER_NAME }}{% endblock %} {% block content %}
 <div class="max-w-5xl mx-auto">
-  <a
-    href="{% url 'student_directory' %}"
-    class="text-xs font-semibold text-slate-500 hover:text-slate-800"
-    >← Back to Directory</a
-  >
+  <a href="{% url 'student_directory' %}" class="text-xs font-semibold text-slate-500 hover:text-slate-800">← Back to Directory</a>
 
-  <div
-    class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 mb-6"
-  >
+  <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-2 mb-6">
     <div class="flex items-center gap-4">
       {% if student.photo %}
-      <img
-        src="{{ student.photo.url }}"
-        alt="Photo of {{ student.full_name }}"
-        class="w-16 h-16 rounded-2xl object-cover border border-slate-200"
-      />
+      <img src="{{ student.photo.url }}" alt="Photo of {{ student.full_name }}" class="w-16 h-16 rounded-2xl object-cover border border-slate-200"/>
       {% else %}
-      <div
-        class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-extrabold"
-      >
+      <div class="w-16 h-16 rounded-2xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-2xl font-extrabold">
         {{ student.full_name|slice:":1"|upper }}
       </div>
       {% endif %}
@@ -30,56 +17,31 @@ CENTER_NAME }}{% endblock %} {% block content %}
         </h1>
         <p class="text-xs font-mono font-bold text-indigo-600 mt-0.5">
           {{ student.enrollment_no }}
-          <span
-            class="ml-2 font-sans px-2 py-0.5 rounded-full bg-slate-100 text-slate-600"
-            >{{ student.get_status_display }}</span
-          >
+          <span class="ml-2 font-sans px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">{{ student.get_status_display }}</span>
         </p>
       </div>
     </div>
     <div class="flex gap-2">
-      <a
-        href="{% url 'edit_admission' student.id %}"
-        class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
-        >Edit</a
-      >
-      <a
-        href="{% url 'staff_id_card' student.id %}"
-        target="_blank"
-        class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition"
-        >ID Card</a
-      >
+      <a href="{% url 'edit_admission' student.id %}" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">Edit</a>
+      <a href="{% url 'staff_id_card' student.id %}" target="_blank" class="px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold text-slate-700 hover:bg-slate-100 transition">ID Card</a>
       {% if student.status == 'PENDING' %}
       <form method="post" action="{% url 'approve_admission' student.id %}">
-        {% csrf_token %}<button
-          class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition"
-        >
-          Approve Admission
-        </button>
+        {% csrf_token %}<button class="px-4 py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-semibold shadow-sm transition">Approve Admission</button>
       </form>
       {% endif %} {% if not student.user_id %}
       <form method="post" action="{% url 'invite_student' student.id %}">
-        {% csrf_token %}<button
-          class="px-4 py-2.5 rounded-xl border border-indigo-300 text-indigo-700 text-sm font-semibold hover:bg-indigo-50 transition"
-          title="Creates a student portal login and emails a set-password link"
-        >
+        {% csrf_token %}<button class="px-4 py-2.5 rounded-xl border border-indigo-300 text-indigo-700 text-sm font-semibold hover:bg-indigo-50 transition" title="Creates a student portal login and emails a set-password link">
           Invite to Portal
         </button>
       </form>
       {% endif %} {% if student.balance_due > 0 %}
-      <a
-        href="{% url 'collect_fee' student.id %}"
-        class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition"
-        >Collect Fee</a
-      >
+      <a href="{% url 'collect_fee' student.id %}" class="px-4 py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold shadow-sm transition">Collect Fee</a>
       {% endif %}
     </div>
   </div>
 
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-    <div
-      class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6"
-    >
+    <div class="lg:col-span-2 bg-white rounded-2xl border border-slate-200/80 shadow-sm p-6">
       <h2 class="font-bold text-slate-900 mb-4">Details</h2>
       <dl class="grid grid-cols-1 sm:grid-cols-2 gap-x-6 gap-y-4 text-sm">
         <div>
@@ -97,8 +59,7 @@ CENTER_NAME }}{% endblock %} {% block content %}
             WhatsApp
           </dt>
           <dd class="font-medium">
-            {% if student.whatsapp_no %}+91 {{ student.whatsapp_no }}{% else
-            %}—{% endif %}
+            {% if student.whatsapp_no %}+91 {{ student.whatsapp_no }}{% else%}—{% endif %}
           </dd>
         </div>
         <div>
@@ -148,8 +109,7 @@ CENTER_NAME }}{% endblock %} {% block content %}
           </dt>
           <dd class="font-medium">
             {% if student.user_id %}Yes{% if not student.email_verified %}
-            (email not verified){% endif %}{% else %}No{% endif %}{% if
-            student.registered_online %} &middot; registered online{% endif %}
+            (email not verified){% endif %}{% else %}No{% endif %}{% if student.registered_online %} &middot; registered online{% endif %}
           </dd>
         </div>
         <div>
@@ -193,8 +153,7 @@ CENTER_NAME }}{% endblock %} {% block content %}
   </div>
 
   <div
-    class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden mt-6"
-  >
+    class="bg-white rounded-2xl border border-slate-200/80 shadow-sm overflow-hidden mt-6">
     <div class="px-6 py-4 border-b border-slate-100 font-bold text-slate-900">
       Payment History
     </div>
@@ -223,11 +182,7 @@ CENTER_NAME }}{% endblock %} {% block content %}
             </td>
             <td class="px-6 py-3 font-semibold">₹{{ r.amount_paid }}</td>
             <td class="px-6 py-3 text-right">
-              <a
-                href="{% url 'view_receipt' r.id %}"
-                class="text-indigo-600 font-semibold text-xs hover:underline"
-                >View</a
-              >
+              <a href="{% url 'view_receipt' r.id %}" class="text-indigo-600 font-semibold text-xs hover:underline">View</a>
             </td>
           </tr>
           {% empty %}
